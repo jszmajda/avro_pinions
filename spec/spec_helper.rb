@@ -1,4 +1,5 @@
 require "bundler/setup"
+require 'pry'
 require "avro_pinions"
 
 RSpec.configure do |config|
