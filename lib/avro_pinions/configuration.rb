@@ -16,11 +16,13 @@ module AvroPinions
       @publisher = pub
     end
 
+    # :type gets pulled off and constructs the given registy
+    # all of the rest of the options get passed to an instance of hte type.kklk
     def schema_registry_options=(options = {})
       klass = options.delete(:type).to_s.split(/_/).map(&:capitalize).join
       const = Object.const_get("AvroPinions::#{klass}Registry")
-      schema = const.new(options)
-      @schema_registry = schema
+      sr = const.new(options)
+      @schema_registry = sr
     end
 
     class InvalidPublisher < StandardError

@@ -24,8 +24,7 @@ module AvroPinions
     end
 
     def publish
-      #pub = AvroPinions::Publisher.new(schema_name: schema)
-      #pub.validate_and_publish!(record, topic)
+      AvroPinions.publisher.publish(topic, record)
     end
 
   end
