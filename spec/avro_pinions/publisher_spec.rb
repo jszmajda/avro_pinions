@@ -23,14 +23,14 @@ describe AvroPinions::Publisher do
         ENV['DEBUG_AVRO'] = nil
       end
 
-      it "does not raise on an invalid record" do
+      xit "does not raise on an invalid record" do
         record = {} # something invalid
         pub = AvroPinions::Publisher.new(schema_name: 'SomeSchema', namespace: 'com.company.namespace')
         expect { pub.validate_and_publish!(record, "topic") }.to_not raise_exception
       end
 
       context "with explicit debug turned on" do
-        it "raises on an invalid record" do
+        xit "raises on an invalid record" do
           record = {} # something invalid
           pub = AvroPinions::Publisher.new(schema_name: 'SomeSchema', namespace: 'com.company.namespace')
           pub.debug!
@@ -42,7 +42,7 @@ describe AvroPinions::Publisher do
     end
 
     context "not in production" do
-      it "raises on an invalid record" do
+      xit "raises on an invalid record" do
         record = {} # something invalid
         pub = AvroPinions::Publisher.new(schema_name: 'SomeSchema', namespace: 'com.company.namespace')
         expect { pub.validate_and_publish!(record, "topic") }.to raise_exception(AvroPinions::UnableToSerializeError)
@@ -54,14 +54,14 @@ describe AvroPinions::Publisher do
   # Need to test these private methods to ensure protocol match
   # They're private to ensure the public API isn't confusing for this class
   describe "wire-safety" do
-    it "encodes messages as base64" do
+    xit "encodes messages as base64" do
       pub = AvroPinions::Publisher.new(schema_name: 'SomeSchema', namespace: 'com.company.namespace')
       expect(pub.send(:wire_safe, "hello")).to eq(Base64.encode64("hello"))
     end
   end
 
   describe "publishing valid records" do
-    it "publishes a message to Industrious" do
+    xit "publishes a message to Industrious" do
       Industrious.session.producer.reset_mocks!
       pub = AvroPinions::Publisher.new(schema_name: 'SomeSchema', namespace: 'com.company.namespace')
       pub.send(:publish_to_wire, "topic", "hello")
