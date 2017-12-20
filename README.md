@@ -25,6 +25,8 @@ Or install it yourself as:
 
 ## Usage
 
+Here's a full example:
+
 ```ruby
 # define a publisher. It has to have one method: `#publish`
 class MyPublisher
@@ -72,6 +74,29 @@ message = SomeMessage.new({ data... })
 if message.valid?
   AvroPinions.publish(message)
 end
+```
+
+Or you can provide things more manually if you want:
+```ruby
+AvroPinions.configure({ wire_format: :single_object })
+
+class Message < AvroPinions::Message
+  def initialize(avro_schema, data)
+    @avro_schema = avro_schema
+    @data = data
+  end
+
+  def record
+    @data
+  end
+
+  def avro_schema
+    @avro_schema
+  end
+end
+
+avro_schema = Avro::Schema.real_parse(json_schema_object)
+Message.new(avro_schema, some_data).encode
 ```
 
 ## Development
