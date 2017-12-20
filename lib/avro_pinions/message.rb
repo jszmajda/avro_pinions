@@ -5,7 +5,7 @@ module AvroPinions
       if defined?(self.class::TOPIC)
         self.class::TOPIC
       else
-        raise MessageBus::NotFullyImplementedError, 'No Topic defined'
+        raise AvroPinions::NotFullyImplementedError, 'No Topic defined'
       end
     end
 
@@ -15,17 +15,17 @@ module AvroPinions
       if defined?(self.class::SCHEMA)
         self.class::SCHEMA
       else
-        raise MessageBus::NotFullyImplementedError, 'No Topic defined'
+        raise AvroPinions::NotFullyImplementedError, 'No Topic defined'
       end
     end
 
     def record
-      raise MessageBus::NotFullyImplementedError, 'No Topic defined'
+      raise AvroPinions::NotFullyImplementedError, 'No Topic defined'
     end
 
     def publish
-      pub = MessageBus::Publisher.new(schema_name: schema)
-      pub.validate_and_publish!(record, topic)
+      #pub = AvroPinions::Publisher.new(schema_name: schema)
+      #pub.validate_and_publish!(record, topic)
     end
 
   end

@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe AvroPinions::Message do
 
+  before :all do
+    AvroPinions.configure(publisher: TestPublisher.new)
+  end
+
   describe "unimplemented defaults" do
     subject { AvroPinions::Message.new }
 
@@ -44,10 +48,10 @@ describe AvroPinions::Message do
     end
     subject { SampleAvroPinionsMessage }
 
-    let(:messages) { Industrious.session.producer.messages_for_topic('test topic') }
+    let(:messages) { AvroPinions.publisher.messages['test topic'] }
 
     before :each do
-      Industrious.session.producer.reset_mocks!
+      AvroPinions.publisher.reset!
       subject.new('sample data').publish
     end
 

@@ -18,7 +18,7 @@ RSpec.describe AvroPinions do
     end
 
     it "passes through publisher to the configuration publisher" do
-      AvroPinions.configure(publisher: Object.new)
+      AvroPinions.configure(publisher: TestPublisher.new)
       expect(AvroPinions.configuration.publisher).to receive('hi').with('there')
 
       AvroPinions.publisher.hi('there')
