@@ -15,17 +15,43 @@ module AvroPinions
       if defined?(self.class::SCHEMA)
         self.class::SCHEMA
       else
-        raise AvroPinions::NotFullyImplementedError, 'No Topic defined'
+        raise AvroPinions::NotFullyImplementedError, 'No Schema defined'
+      end
+    end
+
+    def namespace
+      if defined?(self.class::NAMESPACE)
+        self.class::NAMESPACE
+      else
+        raise AvroPinions::NotFullyImplementedError, 'No Namespace defined'
       end
     end
 
     def record
-      raise AvroPinions::NotFullyImplementedError, 'No Topic defined'
+      raise AvroPinions::NotFullyImplementedError, 'record method not implemented'
     end
 
     def publish
       AvroPinions.publisher.publish(topic, record)
     end
 
+    def encode
+      codec.encode(record)
+    end
+
+    def valid?
+      Avro::Schema.validate(avro_schema, AvroPinions::Codec.pedantic_data(record))
+    end
+
+    def codec
+      @codec ||= AvroPinions::Codec.new(avro_schema)
+    end
+
+    def avro_schema
+      @avro_schema ||= AvroPinions.schema_registry.schema(schema, namespace)
+    end
+
+    class InvalidRecord < StandardError
+    end
   end
 end

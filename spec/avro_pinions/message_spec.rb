@@ -34,14 +34,6 @@ describe AvroPinions::Message do
         @data = data
       end
 
-      def topic
-        TOPIC
-      end
-
-      def schema
-        SCHEMA
-      end
-
       def record
         { value: @data }
       end
@@ -57,14 +49,6 @@ describe AvroPinions::Message do
 
     it "publishes a message to the proper topic" do
       expect(messages.length).to eq(1)
-    end
-
-    xit "encodes the proper data" do
-      expect(messages.length).to eq(1)
-
-      b64 = messages.last
-      decoded = AvroPinions.avro.decode(Base64.decode64(b64))
-      expect(decoded['value']).to eq('sample data')
     end
   end
 
@@ -91,4 +75,41 @@ describe AvroPinions::Message do
     end
   end
 
+  describe "#avro_schema" do
+    before :each do
+      configure_avro_pinions_for_local_test_files
+    end
+
+    it "returns an Avro schema" do
+      message = BasicMessage.new('hi')
+      expect(message.avro_schema).to be_instance_of(Avro::Schema::RecordSchema)
+    end
+  end
+
+  describe "#encode" do
+    it "calls the codec to encode data" do
+      message = BasicMessage.new('hi')
+      expect_any_instance_of(AvroPinions::Codec).to receive(:encode).with(message.record)
+      message.encode
+    end
+  end
+
+  describe "validation" do
+    it "validates a record" do
+      message = BasicMessage.new(nil)
+      expect(message.valid?).to be false
+
+      message2 = BasicMessage.new("hi")
+      expect(message2.valid?).to be true
+    end
+
+    it "raises when an invalid record is encoded" do
+      AvroPinions.configure(wire_format: :single_object)
+
+      message = BasicMessage.new(nil)
+      expect {
+        message.encode
+      }.to raise_exception(Avro::IO::AvroTypeError)
+    end
+  end
 end

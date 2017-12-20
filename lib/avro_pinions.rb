@@ -1,6 +1,6 @@
+require "ext/avro_patches"
 require "avro_pinions/version"
 require 'avro_pinions/configuration'
-require 'avro_pinions/publisher'
 require 'avro_pinions/message'
 require 'avro_pinions/schema_registry'
 require 'avro_pinions/codec'
@@ -17,7 +17,7 @@ module AvroPinions
     if messages.respond_to?(:each_pair)
       messages.each_pair do |key, value|
         if value && configuration.respond_to?("#{key}=")
-          configuration.send("#{key}=", *value)
+          configuration.send("#{key}=", value)
         elsif configuration.respond_to?(key)
           configuration.send(key, *value)
         end
@@ -30,8 +30,16 @@ module AvroPinions
   def publisher
     configuration.publisher
   end
+
   def schema_registry
     configuration.schema_registry
+  end
+
+  def publish(message)
+    topic = message.topic
+    encoded = message.encode
+
+    publisher.publish(topic, encoded)
   end
 
   class NotFullyImplementedError < StandardError

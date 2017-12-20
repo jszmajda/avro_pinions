@@ -25,7 +25,54 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+# define a publisher. It has to have one method: `#publish`
+class MyPublisher
+  # publish needs receive a topic and a message
+  # message is binary encoded AVRO data
+  def publish(topic, message)
+    # depending on how your transport mechanism works you may need to convert
+    # binary data to ascii characters or something. I recommend Base64 if you
+    # have to do that
+    extra_encoded = make_binary_data_wire_safe(message)
+    SomeTransferMechanismIOwn.send(topic, extra_encoded)
+  end
+end
+
+# configure AvroPinions
+AvroPinions.configure({
+  wire_format: :single_object,
+  schema_registry: {
+    type: :file,
+    schema_path: 'doc/schemas'
+  },
+  publisher: MyPublisher.new
+})
+
+# define a message. They inherit from AvroPinions::Message
+class SomeMessage < AvroPinions::Message
+  # define these constants or override `topic`, `schema`, and `namespace`
+  # methods
+  TOPIC = "some_topic"
+  SCHEMA = "SchemaName"
+  NAMESPACE = "com.company.namespace"
+
+  def initialize(data)
+    @data = data
+  end
+
+  # this method must return a json object that will be encoded with the AVRO
+  # schema
+  def record
+    { key: @data.value }
+  end
+end
+
+message = SomeMessage.new({ data... })
+if message.valid?
+  AvroPinions.publish(message)
+end
+```
 
 ## Development
 

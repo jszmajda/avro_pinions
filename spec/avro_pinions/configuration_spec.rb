@@ -24,14 +24,16 @@ describe AvroPinions::Configuration do
     end
 
     it "validates the publisher against some expected APIs" do
+      config = AvroPinions.configuration
+ 
       expect {
-        AvroPinions.configure(publisher: InvalidPublisher.new)
-      }.to raise_exception(AvroPinions::Configuration::InvalidPublisher)
+        config.publisher = InvalidPublisher.new
+      }.to raise_exception(AvroPinions::Configuration::InvalidConfiguration)
       expect {
-        AvroPinions.configure(publisher: InvalidPublisher2.new)
-      }.to raise_exception(AvroPinions::Configuration::InvalidPublisher)
+        config.publisher = InvalidPublisher2.new
+      }.to raise_exception(AvroPinions::Configuration::InvalidConfiguration)
       expect {
-        AvroPinions.configure(publisher: ValidPublisher.new)
+        config.publisher = ValidPublisher.new
       }.to_not raise_error
     end
   end
@@ -40,12 +42,44 @@ describe AvroPinions::Configuration do
     # I could really TDD the hell out of this but I'm running short on time now.
     it "allows registry configuration" do
       config = AvroPinions.configuration
-      config.schema_registry_options = {
+      config.schema_registry = {
           type: :file,
           schema_path: 'spec/support/schemas'
       }
 
       expect(config.schema_registry).to be_instance_of(AvroPinions::FileRegistry)
+    end
+  end
+
+  describe "wire format" do
+    it "raises on a nil wire format" do
+      config = AvroPinions.configuration
+      expect {
+        config.wire_format = nil
+      }.to raise_exception(AvroPinions::Configuration::InvalidConfiguration)
+    end
+
+    it "raises on an empty wire format" do
+      config = AvroPinions.configuration
+      expect {
+        config.wire_format = ""
+      }.to raise_exception(AvroPinions::Configuration::InvalidConfiguration)
+    end
+
+    it "raises on an invalid wire format" do
+      config = AvroPinions.configuration
+      expect {
+        config.wire_format = :lololol
+      }.to raise_exception(AvroPinions::Configuration::InvalidConfiguration)
+    end
+
+    it "accepts a valid wire format" do
+      config = AvroPinions.configuration
+      fmt = AvroPinions::Codec::SUPPORTED_WIRE_FORMATS.sample
+
+      config.wire_format = fmt
+
+      expect(config.wire_format).to eq(fmt)
     end
   end
 end
